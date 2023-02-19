@@ -5,16 +5,16 @@ import ThemeToggle from "./ThemeToggle.astro";
 /** Main menu items */
 const textLinks: { label: string; href: string }[] = [
   { label: "Home", href: "/" },
-  { label: "Work", href: "/work/" },
+  { label: "Portfolio", href: "/portfolio/" },
   { label: "About", href: "/about/" },
 ];
 
 /** Icon links to social media — edit these with links to your profiles! */
 const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/lunaracosta/", icon: "linkedin-logo" },
   { label: "dribbble", href: "https://dribbble.com/lunara", icon: "dribbble-logo" },
-  { label: "Behance", href: "https://www.behance.net/lunaracosta", icon: "twitch-logo" },
   { label: "Twitter", href: "https://twitter.com/lunaraleto", icon: "twitter-logo" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/lunaracosta/", icon: "github-logo" },
+  { label: "Behance", href: "https://www.behance.net/lunaracosta", icon: "behance-logo" },
 ];
 ---
 
