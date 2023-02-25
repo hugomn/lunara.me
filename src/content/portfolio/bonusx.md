@@ -27,6 +27,6 @@ I worked in the big and complex UX of the platform, which englobes:
 
 As a designer, I'm glad to have worked on a project that somehow helps out people to have easier access to public subsidies. This product has been live since 2020 and has already helped numerous users in their journey to access public subsidies in Italy.
 
-View <a href="/assets/portfolio/bonusx-showcase.pdf">Showcase</a>
+View <a href="/assets/portfolio/bonusx-showcase.pdf" target="_blank">Showcase</a>
 
 You can have a look in the live platform clicking <a href="https://app.bonusx.it/welcome" target="_blank">here</a>.
