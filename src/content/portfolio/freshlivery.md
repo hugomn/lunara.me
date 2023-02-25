@@ -1,6 +1,6 @@
 ---
 title: Freshlivery
-publishDate: 2023-02-01 00:00:00
+publishDate: 2023-03-01 00:00:00
 img: /assets/portfolio/freshlivery-cover.jpg
 img_alt: Fresh food app screens
 description: |
@@ -8,6 +8,8 @@ description: |
 tags:
   - Ecommerce
   - Mobile
+  - Product design
+  - Design System
 year: 2020
 link: https://www.figma.com/proto/WDJeJOgC7dnM1rRDiNOT8j/Freshlivery-PoC-(L)?page-id=1%3A6&node-id=33%3A6&viewport=1382%2C1214%2C0.1&scaling=scale-down&starting-point-node-id=33%3A6
 tool: figma
