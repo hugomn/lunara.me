@@ -6,8 +6,9 @@ img_alt: Some components from the concept in a colorful background
 description: |
   PoC for the chain Mina, simulating the KYC process into their transactions.
 tags:
-  - Ecommerce
-  - Mobile
+  - crypto
+  - web app
+  - PoC
 year: 2022
 link: https://www.figma.com/proto/WDJeJOgC7dnM1rRDiNOT8j/Freshlivery-PoC-(L)?page-id=1%3A6&node-id=33%3A6&viewport=1382%2C1214%2C0.1&scaling=scale-down&starting-point-node-id=33%3A6
 tool: figma

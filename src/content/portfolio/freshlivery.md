@@ -1,6 +1,6 @@
 ---
 title: Freshlivery
-publishDate: 2023-03-01 00:00:00
+publishDate: 2023-02-01 00:00:00
 img: /assets/portfolio/freshlivery-cover.jpg
 img_alt: Fresh food app screens
 description: |
