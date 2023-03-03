@@ -1,12 +1,13 @@
 ---
 title: BonusX
-publishDate: 2023-02-01 00:00:00
+publishDate: 2023-03-01 00:00:00
 img: /assets/portfolio/bonusx-cover.jpg
 img_alt: Benefits platform screens
 description: |
   Responsive web app for social benefits and bonuses help. This project was designed in 2020 and it's currently live.
 tags:
   - Web design
+  - Product design
   - Management console
   - Mobile
 year: 2020

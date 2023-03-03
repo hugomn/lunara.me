@@ -1,6 +1,6 @@
 ---
 title: Wedding responsive website
-publishDate: 2023-03-01 00:00:00
+publishDate: 2022-03-01 00:00:00
 img: /assets/portfolio/wedding-cover.jpeg
 img_alt: My wedding website
 description: |
