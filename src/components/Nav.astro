@@ -35,6 +35,7 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
   </div>
   <div id="menu-content">
     <ul class="nav-items">
+      <div class="nav-slider" aria-hidden="true"></div>
       {
         textLinks.map(({ label, href }) => (
           <li>
@@ -106,6 +107,125 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
     }
   }
   customElements.define("menu-button", MenuButton);
+
+  // Navigation slider with cross-page animation support
+  function initNavSlider() {
+    console.log('🔄 Initializing nav slider...');
+    
+    // Only run on desktop
+    if (!window.matchMedia('(min-width: 50em)').matches) {
+      return;
+    }
+
+    const slider = document.querySelector('.nav-slider') as HTMLElement;
+    const navItems = document.querySelector('.nav-items') as HTMLElement;
+    const links = document.querySelectorAll('.nav-items .link') as NodeListOf<HTMLAnchorElement>;
+    
+    if (!slider || !navItems || !links.length) {
+      console.log('❌ Missing elements for slider');
+      return;
+    }
+
+    // Function to get link position data
+    function getLinkPosition(link: HTMLAnchorElement) {
+      const navItemsRect = navItems.getBoundingClientRect();
+      const linkRect = link.getBoundingClientRect();
+      
+      return {
+        left: linkRect.left - navItemsRect.left - 9,
+        width: linkRect.width,
+        text: link.textContent?.trim() || ''
+      };
+    }
+
+    // Function to move slider to a specific position
+    function moveSliderToPosition(left: number, width: number, animate = true) {
+      if (!animate) {
+        slider.style.transition = 'none';
+      }
+      
+      slider.style.transform = `translateX(${left}px)`;
+      slider.style.width = `${width}px`;
+      slider.style.opacity = '1';
+      
+      if (!animate) {
+        requestAnimationFrame(() => {
+          slider.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+      }
+    }
+
+    // Get current active link
+    const activeLink = document.querySelector('.nav-items .link.active') as HTMLAnchorElement;
+    if (!activeLink) {
+      console.log('❌ No active link found');
+      return;
+    }
+
+    const currentPos = getLinkPosition(activeLink);
+    console.log('🎯 Current page:', currentPos.text);
+
+    // Check if we have a previous position stored
+    const storedPos = sessionStorage.getItem('navSliderPos');
+    const prevPos = storedPos ? JSON.parse(storedPos) : null;
+
+    if (prevPos && prevPos.text !== currentPos.text) {
+      console.log('🎬 Animating from:', prevPos.text, 'to:', currentPos.text);
+      
+      // Start from previous position
+      moveSliderToPosition(prevPos.left, prevPos.width, false);
+      
+      // Animate to current position after a small delay
+      setTimeout(() => {
+        moveSliderToPosition(currentPos.left, currentPos.width, true);
+      }, 50);
+    } else {
+      console.log('📍 Setting initial position for:', currentPos.text);
+      moveSliderToPosition(currentPos.left, currentPos.width, false);
+    }
+
+    // Store current position
+    sessionStorage.setItem('navSliderPos', JSON.stringify(currentPos));
+
+    // Add click handlers
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const clickedPos = getLinkPosition(link);
+        console.log('🖱️ Storing position for:', clickedPos.text);
+        
+        // Store the clicked position for the next page
+        sessionStorage.setItem('navSliderPos', JSON.stringify(currentPos));
+        sessionStorage.setItem('navSliderTarget', JSON.stringify(clickedPos));
+        
+        // Immediately animate to clicked position
+        if (!link.classList.contains('active')) {
+          moveSliderToPosition(clickedPos.left, clickedPos.width, true);
+          
+          // Add transitioning class to the clicked link to start color transition
+          link.classList.add('transitioning');
+          
+          // Remove transitioning class after the animation completes
+          setTimeout(() => {
+            link.classList.remove('transitioning');
+          }, 400);
+        }
+      });
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      const currentActive = document.querySelector('.nav-items .link.active') as HTMLAnchorElement;
+      if (currentActive) {
+        const resizedPos = getLinkPosition(currentActive);
+        moveSliderToPosition(resizedPos.left, resizedPos.width, false);
+        sessionStorage.setItem('navSliderPos', JSON.stringify(resizedPos));
+      }
+    });
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initNavSlider);
+  document.addEventListener('astro:page-load', initNavSlider);
 </script>
 
 <style>
@@ -187,11 +307,21 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
     display: inline-block;
     color: var(--gray-300);
     text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
   }
 
   .link.active {
     color: var(--gray-0);
+    font-weight: 600;
   }
+
+  /* Hide nav slider on mobile */
+  .nav-slider {
+    display: none;
+  }
+
+
 
   .menu-footer {
     --icon-size: var(--text-xl);
@@ -262,6 +392,7 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
       padding: 0.5rem 0.5625rem;
       background: radial-gradient(var(--gray-900), var(--gray-800) 150%);
       box-shadow: var(--shadow-md);
+      overflow: hidden;
     }
 
     .nav-items::before {
@@ -273,21 +404,52 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
       z-index: -1;
     }
 
-    .link {
-      padding: 0.5rem 1rem;
+    .nav-slider {
+      display: block;
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5625rem;
+      height: calc(100% - 1rem);
+      background: var(--accent-regular);
       border-radius: 999rem;
-      transition: color var(--theme-transition), background-color var(--theme-transition);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+      opacity: 0;
+      transform: translateX(0);
+      width: 0;
     }
 
-    .link:hover,
-    .link:focus {
+    .link {
+      position: relative;
+      padding: 0.5rem 1rem;
+      border-radius: 999rem;
+      z-index: 2;
+      color: var(--gray-300);
+      transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Hover state - subtle background and color change */
+    .link:hover:not(.active) {
       color: var(--gray-100);
       background-color: var(--accent-subtle-overlay);
     }
 
+    /* Active state - white text, no background (slider provides the purple) */
     .link.active {
       color: var(--accent-text-over);
-      background-color: var(--accent-regular);
+      background-color: transparent;
+    }
+
+    /* When active item is hovered, keep it transparent so slider shows through */
+    .link.active:hover {
+      background-color: transparent;
+    }
+
+    /* Temporary class for smooth transitions - white text that appears during slider animation */
+    .link.transitioning {
+      color: var(--accent-text-over);
+      background-color: transparent;
+      transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .menu-footer {
