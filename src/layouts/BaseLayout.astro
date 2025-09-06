@@ -19,6 +19,7 @@ const { title, description } = Astro.props;
 <html lang="en">
 	<head>
 		<MainHead title={title} description={description} />
+		<ClientRouter />
 	</head>
 	<body>
 		<div class="stack backgrounds">
@@ -28,8 +29,16 @@ const { title, description } = Astro.props;
 		</div>
 
 		<script>
-			// Add “loaded” class once the document has completely loaded.
+			// Add "loaded" class once the document has completely loaded.
 			addEventListener('load', () => document.documentElement.classList.add('loaded'));
+			
+			// Preserve theme during page transitions
+			document.addEventListener('astro:before-swap', (e) => {
+				const isDark = document.documentElement.classList.contains('theme-dark');
+				if (isDark) {
+					e.newDocument.documentElement.classList.add('theme-dark');
+				}
+			});
 		</script>
 
 		<style>

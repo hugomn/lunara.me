@@ -142,16 +142,18 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
     function moveSliderToPosition(left: number, width: number, animate = true) {
       if (!animate) {
         slider.style.transition = 'none';
-      }
-      
-      slider.style.transform = `translateX(${left}px)`;
-      slider.style.width = `${width}px`;
-      slider.style.opacity = '1';
-      
-      if (!animate) {
-        requestAnimationFrame(() => {
-          slider.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-        });
+        slider.style.transform = `translateX(${left}px)`;
+        slider.style.width = `${width}px`;
+        slider.style.opacity = '1';
+        
+        // Force a reflow before re-enabling transitions
+        void slider.offsetHeight;
+        
+        slider.style.transition = '';
+      } else {
+        slider.style.transform = `translateX(${left}px)`;
+        slider.style.width = `${width}px`;
+        slider.style.opacity = '1';
       }
     }
 
@@ -175,10 +177,10 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
       // Start from previous position
       moveSliderToPosition(prevPos.left, prevPos.width, false);
       
-      // Animate to current position after a small delay
-      setTimeout(() => {
+      // Animate to current position immediately on next frame
+      requestAnimationFrame(() => {
         moveSliderToPosition(currentPos.left, currentPos.width, true);
-      }, 50);
+      });
     } else {
       console.log('📍 Setting initial position for:', currentPos.text);
       moveSliderToPosition(currentPos.left, currentPos.width, false);
@@ -191,23 +193,23 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
     links.forEach(link => {
       link.addEventListener('click', (e) => {
         const clickedPos = getLinkPosition(link);
-        console.log('🖱️ Storing position for:', clickedPos.text);
+        console.log('🖱️ Clicked:', clickedPos.text);
         
-        // Store the clicked position for the next page
+        // Store positions for the next page
         sessionStorage.setItem('navSliderPos', JSON.stringify(currentPos));
-        sessionStorage.setItem('navSliderTarget', JSON.stringify(clickedPos));
         
-        // Immediately animate to clicked position
+        // Immediately animate to clicked position without delay
         if (!link.classList.contains('active')) {
+          // Instantly update text color
+          links.forEach(l => {
+            l.classList.remove('transitioning');
+            if (l === link) {
+              l.classList.add('transitioning');
+            }
+          });
+          
+          // Move slider immediately
           moveSliderToPosition(clickedPos.left, clickedPos.width, true);
-          
-          // Add transitioning class to the clicked link to start color transition
-          link.classList.add('transitioning');
-          
-          // Remove transitioning class after the animation completes
-          setTimeout(() => {
-            link.classList.remove('transitioning');
-          }, 400);
         }
       });
     });
@@ -412,11 +414,12 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
       height: calc(100% - 1rem);
       background: var(--accent-regular);
       border-radius: 999rem;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1), width 0.25s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.1s ease;
       z-index: 1;
       opacity: 0;
       transform: translateX(0);
       width: 0;
+      will-change: transform, width;
     }
 
     .link {
@@ -425,7 +428,7 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
       border-radius: 999rem;
       z-index: 2;
       color: var(--gray-300);
-      transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: color 0.15s ease-out, background-color 0.15s ease-out;
     }
 
     /* Hover state - subtle background and color change */
@@ -447,9 +450,9 @@ const iconLinks: { label: string; href: string; icon: IconProps["icon"] }[] = [
 
     /* Temporary class for smooth transitions - white text that appears during slider animation */
     .link.transitioning {
-      color: var(--accent-text-over);
-      background-color: transparent;
-      transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--accent-text-over) !important;
+      background-color: transparent !important;
+      transition: none;
     }
 
     .menu-footer {
